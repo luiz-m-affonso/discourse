@@ -70,7 +70,9 @@ createWidget("header-notifications", {
       ),
     ];
 
-    contents.push(userStatus());
+    if (this.currentUser.customStatus) {
+      contents.push(userStatusBubble(this.currentUser.customStatus));
+    }
 
     if (user.isInDoNotDisturb()) {
       contents.push(h("div.do-not-disturb-background", iconNode("moon")));
@@ -325,12 +327,12 @@ createWidget("header-cloak", {
   scheduleRerender() {},
 });
 
-function userStatus() {
-  const statusEmoji = emojiUnescape(":mega:");
+function userStatusBubble(status) {
+  const emoji = emojiUnescape(`:${status.emoji}:`);
   return h(
     "div.user-status-background",
     new RawHtml({
-      html: `<span>${statusEmoji}</span>`,
+      html: `<span>${emoji}</span>`,
     })
   );
 }
