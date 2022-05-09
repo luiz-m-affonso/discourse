@@ -5,6 +5,8 @@ class UploadReference < ActiveRecord::Base
   belongs_to :target, polymorphic: true
 
   def self.ensure_exist!(upload_ids: [], target: nil, target_type: nil, target_id: nil)
+    raise "target OR target_type and target_id are required" if !target && !(target_type && target_id)
+
     if target.present?
       target_type = target.class
       target_id = target.id
