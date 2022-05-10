@@ -137,10 +137,19 @@ createWidgetFrom(QuickAccessPanel, "quick-access-profile", {
   },
 
   _userStatusButton() {
-    return {
-      action: "setUserStatus",
-      content: I18n.t("user_status.set_custom_status"),
-      icon: "plus-circle",
-    };
+    const customStatus = this.currentUser.customStatus;
+    if (customStatus) {
+      return {
+        action: "setUserStatus",
+        content: customStatus.description,
+        icon: "plus-circle",
+      };
+    } else {
+      return {
+        action: "setUserStatus",
+        content: I18n.t("user_status.set_custom_status"),
+        icon: "plus-circle",
+      };
+    }
   },
 });
