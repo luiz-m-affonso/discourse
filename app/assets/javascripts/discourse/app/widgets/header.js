@@ -11,8 +11,6 @@ import { schedule } from "@ember/runloop";
 import { scrollTop } from "discourse/mixins/scroll-top";
 import { wantsNewWindow } from "discourse/lib/intercept-click";
 import { logSearchLinkClick } from "discourse/lib/search";
-import RawHtml from "discourse/widgets/raw-html";
-import { emojiUnescape } from "discourse/lib/text";
 
 const _extraHeaderIcons = [];
 
@@ -71,7 +69,11 @@ createWidget("header-notifications", {
     ];
 
     if (this.currentUser.customStatus) {
-      contents.push(userStatusBubble(this.currentUser.customStatus));
+      contents.push(
+        this.attach("user-status-bubble", {
+          emoji: this.currentUser.customStatus.emoji,
+        })
+      );
     }
 
     if (user.isInDoNotDisturb()) {
@@ -326,16 +328,6 @@ createWidget("header-cloak", {
   click() {},
   scheduleRerender() {},
 });
-
-function userStatusBubble(status) {
-  const emoji = emojiUnescape(`:${status.emoji}:`);
-  return h(
-    "div.user-status-background",
-    new RawHtml({
-      html: `<span>${emoji}</span>`,
-    })
-  );
-}
 
 let additionalPanels = [];
 export function attachAdditionalPanel(name, toggle, transformAttrs) {
