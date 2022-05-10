@@ -23,7 +23,7 @@ createWidgetFrom(QuickAccessItem, "logout-item", {
 });
 
 createWidgetFrom(QuickAccessItem, "user-status-item", {
-  tagName: "li.logout",
+  tagName: "li.user-status",
 
   html() {
     const userStatus = this.currentUser.customStatus;
