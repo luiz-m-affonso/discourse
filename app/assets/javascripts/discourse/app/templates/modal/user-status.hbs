@@ -13,6 +13,12 @@
           disabled=(not statusIsSet)
           action=(action "saveAndClose")}}
       {{d-modal-cancel close=(action "closeModal")}}
+      {{#if showDeleteButton}}
+        {{d-button
+            icon="trash-alt"
+            class="delete-status btn-danger"
+            action=(action "delete")}}
+      {{/if}}
     </div>
   {{/conditional-loading-spinner}}
 {{/d-modal-body}}

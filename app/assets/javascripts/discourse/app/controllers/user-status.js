@@ -6,11 +6,22 @@ import { notEmpty } from "@ember/object/computed";
 export default Controller.extend(ModalFunctionality, {
   userStatus: "",
   statusIsSet: notEmpty("userStatus"),
+  showDeleteButton: false,
 
   onShow() {
     if (this.currentUser.customStatus?.description) {
-      this.set("userStatus", this.currentUser.customStatus?.description);
+      this.setProperties({
+        userStatus: this.currentUser.customStatus?.description,
+        showDeleteButton: true,
+      });
     }
+  },
+
+  @action
+  delete() {
+    this.set("userStatus", "");
+    this.currentUser.customStatus = null;
+    this.send("closeModal");
   },
 
   @action
