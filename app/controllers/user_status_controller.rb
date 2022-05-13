@@ -5,6 +5,7 @@ class UserStatusController < ApplicationController
 
   def set
     Rails.logger.warn("set custom status")
+    render json: success_json
     # raise Discourse::InvalidParameters.new(:duration) if params[:duration].blank?
     #
     # duration_minutes = (Integer(params[:duration]) rescue false)
@@ -23,18 +24,14 @@ class UserStatusController < ApplicationController
     # end
   end
 
-  def edit
-    Rails.logger.warn("edit custom status")
-    # super
-  end
-
-  def delete
+  def clear
     Rails.logger.warn("delete custom status")
     # current_user.active_do_not_disturb_timings.destroy_all
     # current_user.publish_do_not_disturb(ends_at: nil)
     # current_user.shelved_notifications.each(&:process)
     # current_user.shelved_notifications.destroy_all
     # render json: success_json
+    render json: success_json
   end
 
   private
