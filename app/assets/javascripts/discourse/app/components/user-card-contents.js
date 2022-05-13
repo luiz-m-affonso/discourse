@@ -49,7 +49,7 @@ export default Component.extend(CardContentsBase, CanCheckEmails, CleansUp, {
     return user.location || user.website_name || this.userTimezone;
   },
 
-  @discourseComputed()
+  @discourseComputed("user.status")
   userStatus() {
     if (!this.siteSettings.enable_user_status || !this.user.status) {
       return "";
