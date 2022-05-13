@@ -2,8 +2,11 @@ import Controller from "@ember/controller";
 import ModalFunctionality from "discourse/mixins/modal-functionality";
 import { action } from "@ember/object";
 import { notEmpty } from "@ember/object/computed";
+import { inject as service } from "@ember/service";
 
 export default Controller.extend(ModalFunctionality, {
+  userStatusService: service("user-status"),
+
   description: "",
   statusIsSet: notEmpty("description"),
   showDeleteButton: false,
@@ -19,20 +22,19 @@ export default Controller.extend(ModalFunctionality, {
 
   @action
   delete() {
-    this.set("description", "");
-    this.currentUser.status = null;
-    this.send("closeModal");
+    this.userStatusService.clear().then(() => {
+      this.set("description", "");
+      this.send("closeModal");
+    });
   },
 
   @action
   saveAndClose() {
     if (this.description) {
-      this.currentUser.status = {
-        emoji: "mega",
-        description: this.description,
-      };
+      const status = { description: this.description };
+      this.userStatusService.set(status).then(() => {
+        this.send("closeModal");
+      });
     }
-
-    this.send("closeModal");
   },
 });
