@@ -6,7 +6,7 @@ class CreateUserStatuses < ActiveRecord::Migration[7.0]
       t.integer :user_id, primary_key: true, null: false
       t.string :emoji, null: true
       t.string :description, null: false
-      t.datetime :created_at, null: false
+      t.datetime :set_at, null: false
       t.datetime :ends_at, null: true
     end
   end
