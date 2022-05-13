@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BasicUserSerializer < ApplicationSerializer
-  attributes :id, :username, :name, :avatar_template
+  attributes :id, :username, :name, :avatar_template, :status
 
   def name
     Hash === user ? user[:name] : user.try(:name)
@@ -45,5 +45,9 @@ class BasicUserSerializer < ApplicationSerializer
 
   def tag_user_notification_levels
     @tag_user_notification_levels ||= TagUser.notification_levels_for(user)
+  end
+
+  def status
+    UserStatusSerializer.new(user.user_status, root: false)
   end
 end
