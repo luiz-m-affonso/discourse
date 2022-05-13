@@ -26,7 +26,7 @@ createWidgetFrom(QuickAccessItem, "user-status-item", {
   tagName: "li.user-status",
 
   html() {
-    const userStatus = this.currentUser.customStatus;
+    const userStatus = this.currentUser.status;
     if (userStatus) {
       return this.attach("flat-button", {
         action: "setUserStatus",

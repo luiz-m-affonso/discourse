@@ -68,10 +68,10 @@ createWidget("header-notifications", {
       ),
     ];
 
-    if (this.currentUser.customStatus) {
+    if (this.currentUser.status) {
       contents.push(
         this.attach("user-status-bubble", {
-          emoji: this.currentUser.customStatus.emoji,
+          emoji: this.currentUser.status.emoji,
         })
       );
     }

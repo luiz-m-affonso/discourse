@@ -4,14 +4,14 @@ import { action } from "@ember/object";
 import { notEmpty } from "@ember/object/computed";
 
 export default Controller.extend(ModalFunctionality, {
-  userStatus: "",
-  statusIsSet: notEmpty("userStatus"),
+  description: "",
+  statusIsSet: notEmpty("description"),
   showDeleteButton: false,
 
   onShow() {
-    if (this.currentUser.customStatus?.description) {
+    if (this.currentUser.status?.description) {
       this.setProperties({
-        userStatus: this.currentUser.customStatus?.description,
+        description: this.currentUser.status?.description,
         showDeleteButton: true,
       });
     }
@@ -19,17 +19,17 @@ export default Controller.extend(ModalFunctionality, {
 
   @action
   delete() {
-    this.set("userStatus", "");
-    this.currentUser.customStatus = null;
+    this.set("description", "");
+    this.currentUser.status = null;
     this.send("closeModal");
   },
 
   @action
   saveAndClose() {
-    if (this.userStatus) {
-      this.currentUser.customStatus = {
+    if (this.description) {
+      this.currentUser.status = {
         emoji: "mega",
-        description: this.userStatus,
+        description: this.description,
       };
     }
 
