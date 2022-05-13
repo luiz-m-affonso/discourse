@@ -51,6 +51,7 @@ class User < ActiveRecord::Base
   has_one :anonymous_user_shadow, ->(record) { where(active: true) }, foreign_key: :master_user_id, class_name: 'AnonymousUser', dependent: :destroy
   has_one :invited_user, dependent: :destroy
   has_one :user_notification_schedule, dependent: :destroy
+  has_one :user_status, dependent: :destroy
 
   # delete all is faster but bypasses callbacks
   has_many :bookmarks, dependent: :delete_all
@@ -494,13 +495,13 @@ class User < ActiveRecord::Base
   def unread_notifications_of_type(notification_type)
     # perf critical, much more efficient than AR
     sql = <<~SQL
-        SELECT COUNT(*)
-          FROM notifications n
-     LEFT JOIN topics t ON t.id = n.topic_id
-         WHERE t.deleted_at IS NULL
-           AND n.notification_type = :notification_type
-           AND n.user_id = :user_id
-           AND NOT read
+         SELECT COUNT(*)
+           FROM notifications n
+      LEFT JOIN topics t ON t.id = n.topic_id
+          WHERE t.deleted_at IS NULL
+            AND n.notification_type = :notification_type
+            AND n.user_id = :user_id
+            AND NOT read
     SQL
 
     # to avoid coalesce we do to_i
@@ -510,13 +511,13 @@ class User < ActiveRecord::Base
   def unread_notifications_of_priority(high_priority:)
     # perf critical, much more efficient than AR
     sql = <<~SQL
-        SELECT COUNT(*)
-          FROM notifications n
-     LEFT JOIN topics t ON t.id = n.topic_id
-         WHERE t.deleted_at IS NULL
-           AND n.high_priority = :high_priority
-           AND n.user_id = :user_id
-           AND NOT read
+         SELECT COUNT(*)
+           FROM notifications n
+      LEFT JOIN topics t ON t.id = n.topic_id
+          WHERE t.deleted_at IS NULL
+            AND n.high_priority = :high_priority
+            AND n.user_id = :user_id
+            AND NOT read
     SQL
 
     # to avoid coalesce we do to_i
@@ -764,23 +765,23 @@ class User < ActiveRecord::Base
 
       if SiteSetting.keep_old_ip_address_count > 0
         DB.exec(<<~SQL, user_id: user_id, ip_address: new_ip, current_timestamp: Time.zone.now)
-        INSERT INTO user_ip_address_histories (user_id, ip_address, created_at, updated_at)
-        VALUES (:user_id, :ip_address, :current_timestamp, :current_timestamp)
-        ON CONFLICT (user_id, ip_address)
-        DO
-          UPDATE SET updated_at = :current_timestamp
+          INSERT INTO user_ip_address_histories (user_id, ip_address, created_at, updated_at)
+          VALUES (:user_id, :ip_address, :current_timestamp, :current_timestamp)
+          ON CONFLICT (user_id, ip_address)
+          DO
+            UPDATE SET updated_at = :current_timestamp
         SQL
 
         DB.exec(<<~SQL, user_id: user_id, offset: SiteSetting.keep_old_ip_address_count)
-        DELETE FROM user_ip_address_histories
-        WHERE id IN (
-          SELECT
-            id
-          FROM user_ip_address_histories
-          WHERE user_id = :user_id
-          ORDER BY updated_at DESC
-          OFFSET :offset
-        )
+          DELETE FROM user_ip_address_histories
+          WHERE id IN (
+            SELECT
+              id
+            FROM user_ip_address_histories
+            WHERE user_id = :user_id
+            ORDER BY updated_at DESC
+            OFFSET :offset
+          )
         SQL
       end
     end
@@ -1492,6 +1493,23 @@ class User < ActiveRecord::Base
       username
     else
       name.presence || username
+    end
+  end
+
+  def clear_status
+    user_status.destroy if user_status
+  end
+
+  def set_status(description)
+    now = Time.zone.now
+    if user_status
+      user_status.update(description: description, set_at: now)
+    else
+      self.user_status = UserStatus.create!(
+        user_id: id,
+        description: description,
+        set_at: now
+      )
     end
   end
 
